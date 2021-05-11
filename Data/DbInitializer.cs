@@ -14,10 +14,10 @@ namespace PeoplePro.Data
 
             // Un-comment this if you don't want to duplicate seed the DB
             // Look for any rooms.
-            //if (context.Rooms.Any())
-            //{
-            //    return;   // DB has already been seeded
-            //}
+            if (context.Rooms.Any())
+            {
+                return;   // DB has already been seeded
+            }
 
             var rooms = new Room[]
             {

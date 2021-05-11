@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace PeoplePro.Models
 {
-    public class Room
+    public class Department
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        // TODO: Add Department models https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
         public List<DepartmentRoom> DepartmentRooms { get; set; }
     }
 }
