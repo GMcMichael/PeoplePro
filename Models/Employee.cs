@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace PeoplePro.Models
+﻿namespace PeoplePro.Models
 {
     public class Employee
     {
@@ -11,7 +6,9 @@ namespace PeoplePro.Models
 
         public string Name { get; set; }
 
-        // TODO: Add some models https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
-        //public List<Room> Rooms { get; set; }
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; }
+        public int RoomId { get; set; }
+        public Room Room { get; set; }
     }
 }

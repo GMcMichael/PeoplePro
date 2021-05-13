@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PeoplePro.Data;
 
 namespace PeoplePro.Migrations
 {
     [DbContext(typeof(PeopleProContext))]
-    partial class PeopleProContextModelSnapshot : ModelSnapshot
+    [Migration("20210512222057_updatedRelationships")]
+    partial class updatedRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,31 +80,6 @@ namespace PeoplePro.Migrations
                     b.ToTable("DepartmentsRooms");
                 });
 
-            modelBuilder.Entity("PeoplePro.Models.Employee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Employees");
-                });
-
             modelBuilder.Entity("PeoplePro.Models.Room", b =>
                 {
                     b.Property<int>("Id")
@@ -148,21 +125,6 @@ namespace PeoplePro.Migrations
 
                     b.HasOne("PeoplePro.Models.Room", "Room")
                         .WithMany("Departments")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PeoplePro.Models.Employee", b =>
-                {
-                    b.HasOne("PeoplePro.Models.Department", "Department")
-                        .WithMany("Employees")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PeoplePro.Models.Room", "Room")
-                        .WithMany("Employees")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

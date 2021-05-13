@@ -1,11 +1,11 @@
 ﻿namespace PeoplePro.Models
 {
-    public class DepartmentRoom
+    public class BuildingDepartment
     {
+        public int BuildingId { get; set; }
+        public Building Building { get; set; }
+
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
-
-        public int RoomId { get; set; }
-        public Room Room { get; set; }
     }
 }

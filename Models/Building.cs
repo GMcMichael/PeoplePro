@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PeoplePro.Models
 {
     public class Building
     {
         public int Id { get; set; }
-
+        [Display(Name = "Building")]
         public string Name { get; set; }
 
-        // TODO: Add some models https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
-        //public List<Room> Rooms { get; set; }
+        public List<Room> Rooms { get; set; }
+        public List<BuildingDepartment> Departments { get; set; }
     }
 }

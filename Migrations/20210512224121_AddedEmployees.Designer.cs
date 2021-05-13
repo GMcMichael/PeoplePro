@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PeoplePro.Data;
 
 namespace PeoplePro.Migrations
 {
     [DbContext(typeof(PeopleProContext))]
-    partial class PeopleProContextModelSnapshot : ModelSnapshot
+    [Migration("20210512224121_AddedEmployees")]
+    partial class AddedEmployees
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
