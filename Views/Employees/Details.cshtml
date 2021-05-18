@@ -19,14 +19,14 @@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Department)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Department.Id)
+        <dd class="col-sm-10">
+            <a asp-controller="Departments" asp-action="Details" asp-route-id="@Model.DepartmentId">@Html.DisplayFor(model => model.Department.Name)</a>
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Room)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Room.Id)
+        <dd class="col-sm-10">
+            <a asp-controller="Rooms" asp-action="Details" asp-route-id="@Model.RoomId">@Html.DisplayFor(model => model.Room.Name)</a>
         </dd>
     </dl>
 </div>

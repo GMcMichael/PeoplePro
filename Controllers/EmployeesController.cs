@@ -47,8 +47,7 @@ namespace PeoplePro.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Id");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id");
+            PopulateDropDowns();
             return View();
         }
 
@@ -65,8 +64,7 @@ namespace PeoplePro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Id", employee.DepartmentId);
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", employee.RoomId);
+            PopulateDropDowns(employee.RoomId, employee.DepartmentId);
             return View(employee);
         }
 
@@ -83,8 +81,7 @@ namespace PeoplePro.Controllers
             {
                 return NotFound();
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Id", employee.DepartmentId);
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", employee.RoomId);
+            PopulateDropDowns(employee.RoomId, employee.DepartmentId);
             return View(employee);
         }
 
@@ -120,8 +117,7 @@ namespace PeoplePro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Id", employee.DepartmentId);
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", employee.RoomId);
+            PopulateDropDowns(employee.RoomId, employee.DepartmentId);
             return View(employee);
         }
 
@@ -159,6 +155,18 @@ namespace PeoplePro.Controllers
         private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.Id == id);
+        }
+
+        private void PopulateDropDowns(object selectedRoom = null, object selectedDepartment = null)
+        {
+            var roomQuery = from r in _context.Rooms
+                            orderby r.Name
+                            select r;
+            var departmentQuery = from d in _context.Departments
+                                  orderby d.Name
+                                  select d;
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Name", selectedRoom);
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", selectedDepartment);
         }
     }
 }

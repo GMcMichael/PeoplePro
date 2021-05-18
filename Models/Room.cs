@@ -10,9 +10,12 @@ namespace PeoplePro.Models
         public string Name { get; set; }
 
         // TODO: Add Department models https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
-        public List<DepartmentRoom> Departments { get; set; }
+        [DisplayFormat(NullDisplayText = "No Departments")]
+        public ICollection<DepartmentRoom> Departments { get; set; }
         public int BuildingID { get; set; }
+        [DisplayFormat(NullDisplayText = "No Building")]
         public Building Building { get; set; }
-        public List<Employee> Employees { get; set; }
+        [DisplayFormat(NullDisplayText = "No Employees")]
+        public ICollection<Employee> Employees { get; set; }
     }
 }

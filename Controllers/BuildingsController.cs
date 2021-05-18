@@ -22,7 +22,10 @@ namespace PeoplePro.Controllers
         // GET: Buildings
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Buildings.ToListAsync());
+            var PeopleProContext = _context.Buildings
+                .Include(b => b.Departments)
+                .Include(b => b.Rooms);
+            return View(await PeopleProContext.ToListAsync());
         }
 
         // GET: Buildings/Details/5
@@ -33,14 +36,17 @@ namespace PeoplePro.Controllers
                 return NotFound();
             }
 
-            var building = await _context.Buildings
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var building = _context.Buildings
+            .Include(b => b.Rooms)
+            .Include(b => b.Departments)
+            .ThenInclude(d => d.Department)
+            .FirstOrDefaultAsync(m => m.Id == id);
             if (building == null)
             {
                 return NotFound();
             }
 
-            return View(building);
+            return View(await building);
         }
 
         // GET: Buildings/Create
@@ -125,6 +131,8 @@ namespace PeoplePro.Controllers
             }
 
             var building = await _context.Buildings
+                .Include(b => b.Departments)
+                .Include(b => b.Rooms)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (building == null)
             {

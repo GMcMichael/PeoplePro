@@ -10,11 +10,59 @@
     <h4>Department</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Buildings)
+        </dt>
+        <dd class="col-sm-10">
+            <table @*class="table"*@>
+                @*<tr>
+                    <th>Name</th>
+                </tr>*@
+                @foreach (var building in Model.Buildings)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Buildings" asp-action="Details" asp-route-id="@building.BuildingId">@Html.DisplayFor(modelItem => building.Building.Name)</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Rooms)
+        </dt>
+        <dd class="col-sm-10">
+            <table>
+                @foreach (var room in Model.Rooms)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Rooms" asp-action="Details" asp-route-id="@room.RoomId">@Html.DisplayFor(modelItem => room.Room.Name)</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employees)
+        </dt>
+        <dd class="col-sm-10">
+            <table>
+                @foreach (var employee in Model.Employees)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@employee.Id">@Html.DisplayFor(modelItem => employee.Name)</a>
+                        </td>
+                    </tr>
+                }
+            </table>
         </dd>
     </dl>
 </div>

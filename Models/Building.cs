@@ -8,8 +8,9 @@ namespace PeoplePro.Models
         public int Id { get; set; }
         [Display(Name = "Building")]
         public string Name { get; set; }
-
-        public List<Room> Rooms { get; set; }
-        public List<BuildingDepartment> Departments { get; set; }
+        [DisplayFormat(NullDisplayText = "No Rooms")]
+        public ICollection<Room> Rooms { get; set; }
+        [DisplayFormat(NullDisplayText = "No Departments")]
+        public ICollection<BuildingDepartment> Departments { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using PeoplePro.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PeoplePro.Data
@@ -9,29 +10,15 @@ namespace PeoplePro.Data
         {
             context.Database.EnsureCreated();
 
-            //Buildings Seed
-            if (!context.Buildings.Any())
-            {
-                var buildings = new Building[]
-                {
-                    new Building { Name="Learning Innovation Center" },
-                    new Building { Name="Memorial Union" },
-                    new Building { Name="Weatherford Hall" },
-                    new Building { Name="Austin Hall" }
-                };
-                context.Buildings.AddRange(buildings);
-                context.SaveChanges();
-            }
             //Room Seed
             if (!context.Rooms.Any())
             {
-                var buildings = context.Buildings.Select(b => b.Id).ToArray();
                 var rooms = new Room[]
                 {
-                    new Room { Name="Room1", BuildingID=buildings[0] },
-                    new Room { Name="Room2", BuildingID=buildings[1] },
-                    new Room { Name="Room3", BuildingID=buildings[2] },
-                    new Room { Name="Room4", BuildingID=buildings[3] }
+                    new Room { Name="Room1" },
+                    new Room { Name="Room2" },
+                    new Room { Name="Room3" },
+                    new Room { Name="Room4" }
                 };
                 context.Rooms.AddRange(rooms);
                 context.SaveChanges();
@@ -51,6 +38,19 @@ namespace PeoplePro.Data
                 context.Departments.AddRange(departments);
                 context.SaveChanges();
             }
+            //Buildings Seed
+            if (!context.Buildings.Any())
+            {
+                var buildings = new Building[]
+                {
+                    new Building { Name="Learning Innovation Center" },
+                    new Building { Name="Memorial Union" },
+                    new Building { Name="Weatherford Hall" },
+                    new Building { Name="Austin Hall" }
+                };
+                context.Buildings.AddRange(buildings);
+                context.SaveChanges();
+            }
             //Employee Seed
             if (!context.Employees.Any())
             {
@@ -66,16 +66,42 @@ namespace PeoplePro.Data
                 context.Employees.AddRange(employees);
                 context.SaveChanges();
             }
-            //DepartmentRoom Seed (removed DbSet)
-            /*if (!context.DepartmentRooms.Any())
+            //DepartmentRoom Seed
+            if (!context.DepartmentsRooms.Any())
             {
-               var departmentsrooms = new DepartmentRoom[]
+                var departments = context.Departments.ToArray();
+                var rooms = context.Rooms.ToArray();
+                for (int i = 0; i < departments.Length; i++)
                 {
-                    new DepartmentRoom {DepartmentId=1, RoomId=1}
-                };
-                context.DepartmentRooms.AddRange(departmentsrooms);
+                    departments[i].Rooms = new List<DepartmentRoom>
+                    {
+                        new DepartmentRoom
+                        {
+                            Department = departments[i],
+                            Room = rooms[i]
+                        }
+                    };
+                }
                 context.SaveChanges();
-            }*/
+            }
+            //BuildingDepartment Seed
+            if(!context.BuildingsDepartments.Any())
+            {
+                var buildings = context.Buildings.ToArray();
+                var departments = context.Departments.ToArray();
+                for (int i = 0; i < departments.Length; i++)
+                {
+                    departments[i].Buildings = new List<BuildingDepartment>
+                    {
+                        new BuildingDepartment
+                        {
+                            Department = departments[i],
+                            Building = buildings[i]
+                        }
+                    };
+                }
+                context.SaveChanges();
+            }
         }
     }
 }

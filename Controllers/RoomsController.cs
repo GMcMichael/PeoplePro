@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PeoplePro.Data;
 using PeoplePro.Models;
@@ -19,7 +20,10 @@ namespace PeoplePro.Controllers
         // GET: Rooms
         public async Task<IActionResult> Index()
         {
-            var peopleProContext = _context.Rooms.Include(r => r.Building);
+            var peopleProContext = _context.Rooms
+                .Include(r => r.Building)
+                .Include(r => r.Departments)
+                .Include(r => r.Employees);
             return View(await peopleProContext.ToListAsync());
         }
 
@@ -31,19 +35,24 @@ namespace PeoplePro.Controllers
                 return NotFound();
             }
 
-            var room = await _context.Rooms
+            var room = _context.Rooms
+                .Include(r => r.Building)
+                .Include(r => r.Departments)
+                .ThenInclude(d => d.Department)
+                .Include(r => r.Employees)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (room == null)
             {
                 return NotFound();
             }
 
-            return View(room);
+            return View(await room);
         }
 
         // GET: Rooms/Create
         public IActionResult Create()
         {
+            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
             return View();
         }
 
@@ -60,6 +69,7 @@ namespace PeoplePro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name", room.BuildingID);
             return View(room);
         }
 
@@ -76,14 +86,13 @@ namespace PeoplePro.Controllers
             {
                 return NotFound();
             }
+            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
             return View(room);
         }
 
         // POST: Rooms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Room room)
         {
             if (id != room.Id)
@@ -111,6 +120,7 @@ namespace PeoplePro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
             return View(room);
         }
 
@@ -123,6 +133,9 @@ namespace PeoplePro.Controllers
             }
 
             var room = await _context.Rooms
+                .Include(r => r.Building)
+                .Include(r => r.Departments)
+                .Include(r => r.Employees)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (room == null)
             {

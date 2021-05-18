@@ -16,10 +16,11 @@ namespace PeoplePro.Data
 
         //TODO: Add Models here
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<DepartmentRoom> DepartmentsRooms { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Building> Buildings { get; set; }
+        public DbSet<BuildingDepartment> BuildingsDepartments { get; set; }
         public DbSet<Employee> Employees { get; set; }
-        //public DbSet<DepartmentRoom> DepartmentsRooms { get; set; }//add if I want to query DepartmentsRooms Directly
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)//Only many to many need a seperate class eg. DepartmantsRooms
         {
@@ -28,8 +29,8 @@ namespace PeoplePro.Data
             modelBuilder.Entity<Department>().ToTable("Departments");
             modelBuilder.Entity<Building>().ToTable("Buildings");
             modelBuilder.Entity<Employee>().ToTable("Employees");
-            modelBuilder.Entity<DepartmentRoom>().ToTable("DepartmentsRooms");
-            modelBuilder.Entity<BuildingDepartment>().ToTable("BuildingsDepartments");
+            //modelBuilder.Entity<DepartmentRoom>().ToTable("DepartmentsRooms");
+            //modelBuilder.Entity<BuildingDepartment>().ToTable("BuildingsDepartments");
 
             //TODO: Add relationships here
             //TODO: see https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
@@ -38,7 +39,7 @@ namespace PeoplePro.Data
             modelBuilder.Entity<DepartmentRoom>()
             .HasKey(dr => new { dr.DepartmentId, dr.RoomId });
 
-            modelBuilder.Entity<DepartmentRoom>()
+            /*modelBuilder.Entity<DepartmentRoom>()
                 .HasOne(dr => dr.Department)
                 .WithMany(dr => dr.Rooms)
                 .HasForeignKey(dr => dr.DepartmentId);
@@ -46,7 +47,7 @@ namespace PeoplePro.Data
             modelBuilder.Entity<DepartmentRoom>()
                 .HasOne(dr => dr.Room)
                 .WithMany(dr => dr.Departments)
-                .HasForeignKey(dr => dr.RoomId);
+                .HasForeignKey(dr => dr.RoomId);*/
 
             //Department - Employee relationship (one to many)
             modelBuilder.Entity<Department>()
@@ -67,7 +68,7 @@ namespace PeoplePro.Data
             modelBuilder.Entity<BuildingDepartment>()
                 .HasKey(bd => new { bd.BuildingId, bd.DepartmentId });
 
-            modelBuilder.Entity<BuildingDepartment>()
+            /*modelBuilder.Entity<BuildingDepartment>()
                 .HasOne(bd => bd.Building)
                 .WithMany(bd => bd.Departments)
                 .HasForeignKey(bd => bd.BuildingId);
@@ -75,7 +76,7 @@ namespace PeoplePro.Data
             modelBuilder.Entity<BuildingDepartment>()
                 .HasOne(bd => bd.Department)
                 .WithMany(bd => bd.Buildings)
-                .HasForeignKey(bd => bd.DepartmentId);
+                .HasForeignKey(bd => bd.DepartmentId);*/
         }
     }
 }
