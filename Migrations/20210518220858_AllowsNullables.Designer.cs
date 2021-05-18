@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PeoplePro.Data;
 
 namespace PeoplePro.Migrations
 {
     [DbContext(typeof(PeopleProContext))]
-    partial class PeopleProContextModelSnapshot : ModelSnapshot
+    [Migration("20210518220858_AllowsNullables")]
+    partial class AllowsNullables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,21 +160,18 @@ namespace PeoplePro.Migrations
                 {
                     b.HasOne("PeoplePro.Models.Department", "Department")
                         .WithMany("Employees")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("DepartmentId");
 
                     b.HasOne("PeoplePro.Models.Room", "Room")
                         .WithMany("Employees")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("RoomId");
                 });
 
             modelBuilder.Entity("PeoplePro.Models.Room", b =>
                 {
                     b.HasOne("PeoplePro.Models.Building", "Building")
                         .WithMany("Rooms")
-                        .HasForeignKey("BuildingID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("BuildingID");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PeoplePro.Models
@@ -7,12 +8,14 @@ namespace PeoplePro.Models
     {
         public int Id { get; set; }
         [Display(Name = "Room")]
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(50)]
         public string Name { get; set; }
 
         // TODO: Add Department models https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
         [DisplayFormat(NullDisplayText = "No Departments")]
         public ICollection<DepartmentRoom> Departments { get; set; }
-        public int BuildingID { get; set; }
+        public Nullable<int> BuildingID { get; set; }
         [DisplayFormat(NullDisplayText = "No Building")]
         public Building Building { get; set; }
         [DisplayFormat(NullDisplayText = "No Employees")]

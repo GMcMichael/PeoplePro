@@ -29,54 +29,34 @@ namespace PeoplePro.Data
             modelBuilder.Entity<Department>().ToTable("Departments");
             modelBuilder.Entity<Building>().ToTable("Buildings");
             modelBuilder.Entity<Employee>().ToTable("Employees");
-            //modelBuilder.Entity<DepartmentRoom>().ToTable("DepartmentsRooms");
-            //modelBuilder.Entity<BuildingDepartment>().ToTable("BuildingsDepartments");
 
             //TODO: Add relationships here
-            //TODO: see https://docs.microsoft.com/en-us/ef/core/modeling/relationships#many-to-many
 
             //Department - Room relationships (many to many)
             modelBuilder.Entity<DepartmentRoom>()
             .HasKey(dr => new { dr.DepartmentId, dr.RoomId });
 
-            /*modelBuilder.Entity<DepartmentRoom>()
-                .HasOne(dr => dr.Department)
-                .WithMany(dr => dr.Rooms)
-                .HasForeignKey(dr => dr.DepartmentId);
-
-            modelBuilder.Entity<DepartmentRoom>()
-                .HasOne(dr => dr.Room)
-                .WithMany(dr => dr.Departments)
-                .HasForeignKey(dr => dr.RoomId);*/
-
             //Department - Employee relationship (one to many)
             modelBuilder.Entity<Department>()
                 .HasMany(d => d.Employees)
-                .WithOne(e => e.Department);
+                .WithOne(e => e.Department)
+                .OnDelete(DeleteBehavior.SetNull);
 
             //Room - Employee relationship (one to many)
             modelBuilder.Entity<Room>()
                 .HasMany(r => r.Employees)
-                .WithOne(e => e.Room);
+                .WithOne(e => e.Room)
+                .OnDelete(DeleteBehavior.SetNull);
 
             //Building - Room relationship (one to many)
             modelBuilder.Entity<Building>()
                 .HasMany(b => b.Rooms)
-                .WithOne(r => r.Building);
+                .WithOne(r => r.Building)
+                .OnDelete(DeleteBehavior.SetNull);
 
             //Building - Department relationship (many to many)
             modelBuilder.Entity<BuildingDepartment>()
                 .HasKey(bd => new { bd.BuildingId, bd.DepartmentId });
-
-            /*modelBuilder.Entity<BuildingDepartment>()
-                .HasOne(bd => bd.Building)
-                .WithMany(bd => bd.Departments)
-                .HasForeignKey(bd => bd.BuildingId);
-
-            modelBuilder.Entity<BuildingDepartment>()
-                .HasOne(bd => bd.Department)
-                .WithMany(bd => bd.Buildings)
-                .HasForeignKey(bd => bd.DepartmentId);*/
         }
     }
 }

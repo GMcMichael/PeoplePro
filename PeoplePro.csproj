@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20210512221542_updatedRelationshipsv2.Designer.cs" />
     <Compile Remove="Migrations\20210512221656_updatedRelationships.cs" />
     <Compile Remove="Migrations\20210512221656_updatedRelationships.Designer.cs" />
+    <Compile Remove="Migrations\20210518220009_DeleteCaseUpdate.cs" />
+    <Compile Remove="Migrations\20210518220009_DeleteCaseUpdate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
