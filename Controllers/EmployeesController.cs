@@ -165,8 +165,8 @@ namespace PeoplePro.Controllers
             var departmentQuery = from d in _context.Departments
                                   orderby d.Name
                                   select d;
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Name", selectedRoom);
-            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", selectedDepartment);
+            ViewData["RoomId"] = new SelectList(roomQuery, "Id", "Name", selectedRoom);
+            ViewData["DepartmentId"] = new SelectList(departmentQuery, "Id", "Name", selectedDepartment);
         }
     }
 }

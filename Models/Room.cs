@@ -17,5 +17,15 @@ namespace PeoplePro.Models
         public Building Building { get; set; }
         [DisplayFormat(NullDisplayText = "No Employees")]
         public ICollection<Employee> Employees { get; set; }
+
+        public bool ContainsDepartment(int id)
+        {
+            if (Departments == null) return false;
+            foreach (var department in Departments)
+            {
+                if (department.DepartmentId == id) return true;
+            }
+            return false;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -52,7 +53,7 @@ namespace PeoplePro.Controllers
         // GET: Rooms/Create
         public IActionResult Create()
         {
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
+            PopulateSelectors();
             return View();
         }
 
@@ -61,15 +62,22 @@ namespace PeoplePro.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Room room)
+        public async Task<IActionResult> Create([Bind("Id,Name,BuildingID")] Room room, int[] selectedDepartments)
         {
-            if (ModelState.IsValid)
+            if (room == null) return NotFound();
+
+            try
             {
+                UpdateInformation(room, selectedDepartments);
                 _context.Add(room);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", new { id = room.Id });
+            } catch(DbUpdateException /*e*/)
+            {
+                ModelState.AddModelError("", "Unable to save changes. Please try again.");
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name", room.BuildingID);
+
+            PopulateSelectors(room);
             return View(room);
         }
 
@@ -81,47 +89,47 @@ namespace PeoplePro.Controllers
                 return NotFound();
             }
 
-            var room = await _context.Rooms.FindAsync(id);
+            var room = await _context.Rooms
+                .Include(r => r.Employees)
+                .Include(r => r.Departments)
+                .Include(r => r.Building)
+                .FirstOrDefaultAsync(r => r.Id == id);
             if (room == null)
             {
                 return NotFound();
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
+            PopulateSelectors(room);
             return View(room);
         }
 
         // POST: Rooms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Room room)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int? id, int[] selectedDepartments)
         {
-            if (id != room.Id)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            if (ModelState.IsValid)
+            var roomToUpdate = await _context.Rooms
+                .Include(r => r.Departments)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if(await TryUpdateModelAsync<Room>(roomToUpdate, "", d => d.Name, d => d.BuildingID))
             {
                 try
                 {
-                    _context.Update(room);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
+                    UpdateInformation(roomToUpdate, selectedDepartments);
+                    _context.SaveChanges();
+                    return RedirectToAction("Details", new { id = id });
+                } catch (DbUpdateException /*e*/)
                 {
-                    if (!RoomExists(room.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "Unable to save changes. Please try again.");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name");
-            return View(room);
+
+            PopulateSelectors(roomToUpdate);
+            return View(roomToUpdate);
         }
 
         // GET: Rooms/Delete/5
@@ -159,6 +167,61 @@ namespace PeoplePro.Controllers
         private bool RoomExists(int id)
         {
             return _context.Rooms.Any(e => e.Id == id);
+        }
+
+        private void PopulateSelectors(Room room = null)
+        {
+            var departmentData = new List<AssignedData>();
+            var departmentQuery = from d in _context.Departments
+                                  orderby d.Name
+                                  select d;
+            var buildingQuery = from b in _context.Buildings
+                                orderby b.Name
+                                select b;
+            foreach (var department in departmentQuery)
+            {
+                departmentData.Add(new AssignedData
+                {
+                    TypeId = department.Id,
+                    Name = department.Name,
+                    Assigned = (room != null ? room.ContainsDepartment(department.Id) : false)
+                });
+            }
+            ViewBag.Departments = departmentData;
+            object selectedBuilding = null;
+            if (room != null) selectedBuilding = room.BuildingID;
+            ViewBag.BuildingId = new SelectList(buildingQuery, "Id", "Name", selectedBuilding);
+        }
+
+        private void UpdateInformation(Room room, int[] selectedDepartments)
+        {
+            if (selectedDepartments == null)
+            {
+                room.Departments = new List<DepartmentRoom>();
+                return;
+            }
+            if (room.Departments == null) room.Departments = new List<DepartmentRoom>();
+            var departmentRooms = new List<DepartmentRoom>(room.Departments);
+            var currDepartmentRooms = new HashSet<int>(room.Departments.Select(d => d.DepartmentId));
+            foreach (var department in _context.Departments)
+            {
+                var newDepartmentRoom = new DepartmentRoom
+                {
+                    DepartmentId = department.Id,
+                    Department = department,
+                    RoomId = room.Id,
+                    Room = room
+                };
+                if(selectedDepartments.Contains(department.Id))
+                {
+                    if (!currDepartmentRooms.Contains(department.Id))
+                        room.Departments.Add(newDepartmentRoom);
+                } else if(currDepartmentRooms.Contains(department.Id))
+                {
+                    DepartmentRoom removeDepartment = departmentRooms.Find(d => d.DepartmentId.Equals(department.Id));
+                    room.Departments.Remove(removeDepartment);
+                }
+            }
         }
     }
 }

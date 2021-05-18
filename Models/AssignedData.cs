@@ -1,8 +1,8 @@
 ﻿namespace PeoplePro.Models
 {
-    public class AssignedRoomData
+    public class AssignedData
     {
-        public int RoomId { get; set; }
+        public int TypeId { get; set; }
         public string Name { get; set; }
         public bool Assigned { get; set; }
     }

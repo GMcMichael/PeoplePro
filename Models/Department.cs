@@ -15,16 +15,9 @@ namespace PeoplePro.Models
         [DisplayFormat(NullDisplayText = "No Buildings")]
         public ICollection<BuildingDepartment> Buildings { get; set; }
 
-        public bool ContainsEmployee(int id)
-        {
-            foreach (var employee in Employees)
-            {
-                if (employee.Id == id) return true;
-            }
-            return false;
-        }
         public bool ContainsRoom(int id)
         {
+            if (Rooms == null) return false;
             foreach (var room in Rooms)
             {
                 if (room.RoomId == id) return true;
@@ -33,6 +26,7 @@ namespace PeoplePro.Models
         }
         public bool ContainsBuilding(int id)
         {
+            if (Buildings == null) return false;
             foreach (var building in Buildings)
             {
                 if (building.BuildingId == id) return true;

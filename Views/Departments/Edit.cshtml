@@ -22,9 +22,36 @@
                 <div class="col-md-offset-2 col-md-10">
                     <table>
                         <tr>
-                            @{ 
+                            @{
                                 int count = 0;
-                                List<PeoplePro.Models.AssignedRoomData> rooms = ViewBag.Rooms;
+                                List<PeoplePro.Models.AssignedData> buildings = ViewBag.Buildings;
+
+                                foreach (var building in buildings)
+                                {
+                                    if (count++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedBuildings"
+                                               value="@building.TypeId"
+                                               @(Html.Raw(building.Assigned ? "checked=\"checked\"" : "")) />
+                                        @building.Name
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{ 
+                                count = 0;
+                                List<PeoplePro.Models.AssignedData> rooms = ViewBag.Rooms;
 
                                 foreach (var room in rooms)
                                 {
@@ -35,7 +62,7 @@
                                     @:<td>
                                         <input type="checkbox"
                                                name="selectedRooms"
-                                               value="@room.RoomId"
+                                               value="@room.TypeId"
                                                @(Html.Raw(room.Assigned ? "checked=\"checked\"" : ""))/>
                                                @room.Name
                                     @:</td>

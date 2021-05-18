@@ -22,6 +22,33 @@
                 <select asp-for="BuildingID" class="form-control" asp-items="ViewBag.BuildingId"></select>
             </div>
             <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int count = 0;
+                                List<PeoplePro.Models.AssignedData> departments = ViewBag.Departments;
+
+                                foreach (var department in departments)
+                                {
+                                    if (count++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedDepartments"
+                                               value="@department.TypeId"
+                                               @(Html.Raw(department.Assigned ? "checked=\"checked\"" : "")) />
+                                        @department.Name
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

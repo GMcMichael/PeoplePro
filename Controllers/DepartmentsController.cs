@@ -64,16 +64,13 @@ namespace PeoplePro.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Department department, int[] selectedRooms)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Department department, int[] selectedRooms, int[]selectedBuildings)
         {
-            if (department == null)
-            {
-                return NotFound();
-            }
+            if (department == null) return NotFound();
 
             try
             {
-                UpdateInformation(selectedRooms, department);
+                UpdateInformation(department, selectedRooms, selectedBuildings);
                 _context.Add(department);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", new { id = department.Id });
@@ -85,16 +82,6 @@ namespace PeoplePro.Controllers
             PopulateSelectors(department);
             return View(department);
         }
-        /*public async Task<IActionResult> Create([Bind("Id,Name")] Department department)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(department);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(department);
-        }*/
 
         // GET: Departments/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -124,12 +111,9 @@ namespace PeoplePro.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, int[] selectedRooms)
+        public async Task<IActionResult> Edit(int? id, int[] selectedRooms, int[] selectedBuildings)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var departmentToUpdate = await _context.Departments
                 .Include(d => d.Rooms)
@@ -139,7 +123,7 @@ namespace PeoplePro.Controllers
             {
                 try
                 {
-                    UpdateInformation(selectedRooms, departmentToUpdate);
+                    UpdateInformation(departmentToUpdate, selectedRooms, selectedBuildings);
                     _context.SaveChanges();
                     return RedirectToAction("Details", new { id = id });
                 }
@@ -191,46 +175,51 @@ namespace PeoplePro.Controllers
 
         private void PopulateSelectors(Department department = null)
         {
-            var roomsData = new List<AssignedRoomData>();
-            if (department != null)
+            var roomsData = new List<AssignedData>();
+            var buildingsData = new List<AssignedData>();
+            var roomQuery = from r in _context.Rooms
+                            orderby r.Name
+                            select r;
+            var buildingQuery = from b in _context.Buildings
+                                  orderby b.Name
+                                  select b;
+            foreach (var Room in roomQuery)
             {
-                foreach (var Room in _context.Rooms)
+                roomsData.Add(new AssignedData
                 {
-                    roomsData.Add(new AssignedRoomData
-                    {
-                        RoomId = Room.Id,
-                        Name = Room.Name,
-                        Assigned = department.ContainsRoom(Room.Id)
-                    });
-                }
-            } else
-            {
-                foreach (var Room in _context.Rooms)
-                {
-                    roomsData.Add(new AssignedRoomData
-                    {
-                        RoomId = Room.Id,
-                        Name = Room.Name,
-                        Assigned = false
-                    });
-                }
+                    TypeId = Room.Id,
+                    Name = Room.Name,
+                    Assigned = (department != null ? department.ContainsRoom(Room.Id) : false)
+                });
             }
-
-            //ViewData["BuildingId"] = new SelectList(_context.Buildings, "Id", "Name", department.Id);
+            foreach (var building in buildingQuery)
+            {
+                buildingsData.Add(new AssignedData
+                {
+                    TypeId = building.Id,
+                    Name = building.Name,
+                    Assigned = (department != null ? department.ContainsBuilding(building.Id) : false)
+                });
+            }
             ViewBag.Rooms = roomsData;
+            ViewBag.Buildings = buildingsData;
         }
 
-        private void UpdateInformation(int[] selectedRooms, Department department)
+        private void UpdateInformation(Department department, int[] selectedRooms, int[] selectedBuildings)
         {
-            if(selectedRooms == null)
+            UpdateRooms(department, selectedRooms);
+            UpdateBuildings(department, selectedBuildings);
+        }
+
+        private void UpdateRooms(Department department, int[] selectedRooms)
+        {
+            if (selectedRooms == null)
             {
                 department.Rooms = new List<DepartmentRoom>();
                 return;
             }
-            if(department.Rooms == null) department.Rooms = new List<DepartmentRoom>();
-            //var buildingDepartments = new List<BuildingDepartment>();
+            if (department.Rooms == null) department.Rooms = new List<DepartmentRoom>();
             var departmentRooms = new List<DepartmentRoom>(department.Rooms);
-            var selectedRoomsHS = new HashSet<int>(selectedRooms);
             var currDepartmentRooms = new HashSet<int>(department.Rooms.Select(r => r.RoomId));
             foreach (var room in _context.Rooms)
             {
@@ -241,15 +230,46 @@ namespace PeoplePro.Controllers
                     RoomId = room.Id,
                     Room = room
                 };
-                if(selectedRooms.Contains(room.Id))
+                if (selectedRooms.Contains(room.Id))
                 {
-                    if(!currDepartmentRooms.Contains(room.Id)) 
+                    if (!currDepartmentRooms.Contains(room.Id))
                         department.Rooms.Add(newDepartmentRoom);
-                }
-                else if(currDepartmentRooms.Contains(room.Id))
+                } else if (currDepartmentRooms.Contains(room.Id))
                 {
                     DepartmentRoom removeRoom = departmentRooms.Find(r => r.RoomId.Equals(room.Id));
                     department.Rooms.Remove(removeRoom);
+                }
+            }
+        }
+
+        private void UpdateBuildings(Department department, int[] selectedBuildings)
+        {
+            if (selectedBuildings == null)
+            {
+                department.Buildings = new List<BuildingDepartment>();
+                return;
+            }
+            if (department.Buildings == null) department.Buildings = new List<BuildingDepartment>();
+            var buildingDepartments = new List<BuildingDepartment>(department.Buildings);
+            var currBuildingDepartments = new HashSet<int>(department.Buildings.Select(b => b.BuildingId));
+            foreach (var building in _context.Buildings)
+            {
+                var newBuildingDepartment = new BuildingDepartment
+                {
+                    DepartmentId = department.Id,
+                    Department = department,
+                    BuildingId = building.Id,
+                    Building = building
+                };
+                if (selectedBuildings.Contains(building.Id))
+                {
+                    if (!currBuildingDepartments.Contains(building.Id))
+                        department.Buildings.Add(newBuildingDepartment);
+                }
+                else if (currBuildingDepartments.Contains(building.Id))
+                {
+                    BuildingDepartment removeBuilding = buildingDepartments.Find(b => b.BuildingId.Equals(building.Id));
+                    department.Buildings.Remove(removeBuilding);
                 }
             }
         }
